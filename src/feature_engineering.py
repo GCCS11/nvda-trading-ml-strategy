@@ -157,35 +157,88 @@ class FeatureEngineer:
 
         return df
 
+    def create_target(self, df: pd.DataFrame, forward_period: int = 5,
+                      threshold: float = 0.02) -> pd.DataFrame:
+        """
+        Create target variable for trading signals.
+
+        Args:
+            df: DataFrame with features
+            forward_period: Days to look forward for returns
+            threshold: Return threshold for long/short signals
+
+        Returns:
+            DataFrame with target variable added
+        """
+        # Calculate forward returns
+        df['forward_returns'] = df['Close'].pct_change(forward_period).shift(-forward_period)
+
+        # Create labels: 1 (long), 0 (hold), -1 (short)
+        df['target'] = 0  # Default to hold
+        df.loc[df['forward_returns'] > threshold, 'target'] = 1  # Long
+        df.loc[df['forward_returns'] < -threshold, 'target'] = -1  # Short
+
+        # Drop the last forward_period rows (no future data)
+        df = df[:-forward_period].copy()
+
+        # Show class distribution
+        print("\nTarget Distribution:")
+        print(f"  Long (1):  {(df['target'] == 1).sum()} ({(df['target'] == 1).sum() / len(df) * 100:.1f}%)")
+        print(f"  Hold (0):  {(df['target'] == 0).sum()} ({(df['target'] == 0).sum() / len(df) * 100:.1f}%)")
+        print(f"  Short (-1): {(df['target'] == -1).sum()} ({(df['target'] == -1).sum() / len(df) * 100:.1f}%)")
+
+        return df
+
+    def prepare_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Complete pipeline to prepare all features and target.
+
+        Args:
+            df: Raw OHLCV DataFrame
+
+        Returns:
+            DataFrame with all features and target
+        """
+        print("Creating features...")
+        df = self.add_returns(df)
+        df = self.add_moving_averages(df)
+        df = self.add_volatility(df)
+        df = self.add_volume_features(df)
+        df = self.add_momentum_features(df)
+
+        print("Creating target variable...")
+        df = self.create_target(df)
+
+        # Drop rows with NaN (from rolling windows)
+        initial_rows = len(df)
+        df = df.dropna()
+        dropped = initial_rows - len(df)
+        print(f"\nDropped {dropped} rows with NaN values")
+        print(f"Final dataset: {len(df)} samples with {len(self.features)} features")
+
+        return df
+
+
 def main():
-    """Test feature engineering on NVDA data."""
+    """Test complete feature engineering pipeline."""
     from data_loader import DataLoader
 
     # Load data
-    loader = DataLoader('NVDA')
+    loader = DataLoader("NVDA")
     df = loader.load_data()
 
-    print(f"Original data shape: {df.shape}")
-    print(f"Columns: {df.columns.tolist()}\n")
+    print(f"Original data: {df.shape}")
+    print("="*60)
 
-    # Create features
+    # Create all features and target
     engineer = FeatureEngineer()
-    df = engineer.add_returns(df)
-    df = engineer.add_moving_averages(df)
-    df = engineer.add_volatility(df)
-    df = engineer.add_volume_features(df)
-    df = engineer.add_momentum_features(df)
+    df_processed = engineer.prepare_features(df)
 
-    print(f"After feature engineering: {df.shape}")
-    print(f"New features added: {len(engineer.features)}")
-    print(f"Features: {engineer.features}\n")
-
-    # Show sample
-    print("Sample of new features:")
-    print(df[['Date', 'Close'] + engineer.features[:5]].tail(10))
-
-    print("\n Feature engineering test complete")
-
+    print("="*60)
+    print(F"\n Feature engineering complete.")
+    print(f"   Shape: {df_processed.shape}")
+    print(f"   Features: {len(engineer.features)}")
+    print(f"   Date range: {df_processed["Date"].min()} to {df_processed["Date"].max()}")
 
 if __name__ == "__main__":
     main()
