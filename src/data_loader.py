@@ -112,13 +112,13 @@ class DataLoader:
 
     def load_data(self, filename: str = None) -> pd.DataFrame:
         """
-        Load data from CSV
+        Load data from CSV.
 
         Args:
             filename: CSV filename to load (default: ticker_raw.csv)
 
-            Returns:
-                DataFrame with loaded data
+        Returns:
+            DataFrame with loaded data
         """
         if filename is None:
             filename = f"{self.ticker}_raw.csv"
@@ -129,7 +129,13 @@ class DataLoader:
             raise FileNotFoundError(f"Data file not found: {filepath}")
 
         df = pd.read_csv(filepath)
-        df["Date"] = pd.to_datetime(df["Date"])
+        df['Date'] = pd.to_datetime(df['Date'])
+
+        # Convert price and volume columns to numeric
+        numeric_cols = ['Open', 'High', 'Low', 'Close', 'Volume']
+        for col in numeric_cols:
+            if col in df.columns:
+                df[col] = pd.to_numeric(df[col], errors='coerce')
 
         print(f"Loaded {len(df)} rows from {filepath}")
 
