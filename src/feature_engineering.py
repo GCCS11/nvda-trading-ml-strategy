@@ -102,6 +102,61 @@ class FeatureEngineer:
 
         return df
 
+    def add_volume_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add volume based features.
+
+        Args:
+            df: DataFrame with OHLCV data
+
+        Returns:
+            DataFrame with volume based features added
+        """
+        # Volume moving averages
+        df['volume_sma_10'] = df['Volume'].rolling(window=10).mean()
+        df['volume_sma_20'] = df['Volume'].rolling(window=20).mean()
+
+        # Volume ratio
+        df['volume_ratio'] = df['Volume'] / df['volume_sma_20']
+
+        # On-Balance Volume (OBV)
+        df['obv'] = (np.sign(df['Close'].diff()) * df['Volume']).fillna(0).cumsum()
+
+        self.features.extend(['volume_sma_10', 'volume_sma_20', 'volume_ratio', 'obv'])
+
+        return df
+
+    def add_momentum_features(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add momentum-based features.
+
+        Args:
+            df: DataFrame with OHLCV data
+
+        Returns:
+            DataFrame with momentum features added
+        """
+        # RSI (Relative Strength Index)
+        delta = df['Close'].diff()
+        gain = (delta.where(delta > 0, 0)).rolling(window=14).mean()
+        loss = (-delta.where(delta < 0, 0)).rolling(window=14).mean()
+        rs = gain / loss
+        df['rsi_14'] = 100 - (100 / (1 + rs))
+
+        # MACD
+        exp1 = df['Close'].ewm(span=12, adjust=False).mean()
+        exp2 = df['Close'].ewm(span=26, adjust=False).mean()
+        df['macd'] = exp1 - exp2
+        df['macd_signal'] = df['macd'].ewm(span=9, adjust=False).mean()
+        df['macd_diff'] = df['macd'] - df['macd_signal']
+
+        # Rate of Change (ROC)
+        df['roc_10'] = ((df['Close'] - df['Close'].shift(10)) / df['Close'].shift(10)) * 100
+
+        self.features.extend(['rsi_14', 'macd', 'macd_signal', 'macd_diff', 'roc_10'])
+
+        return df
+
 def main():
     """Test feature engineering on NVDA data."""
     from data_loader import DataLoader
@@ -118,6 +173,8 @@ def main():
     df = engineer.add_returns(df)
     df = engineer.add_moving_averages(df)
     df = engineer.add_volatility(df)
+    df = engineer.add_volume_features(df)
+    df = engineer.add_momentum_features(df)
 
     print(f"After feature engineering: {df.shape}")
     print(f"New features added: {len(engineer.features)}")
