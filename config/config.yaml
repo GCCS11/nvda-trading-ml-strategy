@@ -1,0 +1,46 @@
+# Project Config
+
+data:
+  ticker: "NVDA"
+  train_split: 0.60
+  test_split: 0.20
+  val_split: 0.20
+  raw_data_path: "data/raw"
+  processed_data_path: "data/processed"
+
+features:
+  forward_period: 5
+  threshold: 0.02
+
+model:
+  batch_size: 32
+  epochs: 50
+  learning_rate: 0.001
+  early_stopping patience: 10
+
+mlp:
+  hidden_layers: [128, 64, 32]
+  dropout: 0.3
+
+cnn:
+  filters: [64, 128, 64]
+  kernel_size: 3
+  pool_size: 2
+  droppout: 0.3
+  sequuence_lenght: 20
+
+lstm:
+  hidden_size: 64
+  num_layers: 2
+  dropout: 0.3
+  sequence_lenght: 20
+
+trading:
+  commission: 0.00125 #0.125%
+  borrow_rate: 0.0025 #0.25 anualized
+  initial_capital: 100000
+  stop_loss: 0.02
+  take_profit: 0.03
+
+
+
