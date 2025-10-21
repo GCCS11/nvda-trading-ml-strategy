@@ -63,6 +63,44 @@ class FeatureEngineer:
 
         return df
 
+    def add_volatility(self, df: pd.DataFrame) -> pd.DataFrame:
+        """
+        Add volatility-based features.
+
+        Args:
+            df: DataFrame with OHLCV data
+
+        Returns:
+            DataFrame with volatility features added
+        """
+        # Historical volatility
+        # Historical volatility (rolling std of returns)
+        df['volatility_10'] = df['returns'].rolling(window=10).std()
+        df['volatility_20'] = df['returns'].rolling(window=20).std()
+        df['volatility_50'] = df['returns'].rolling(window=50).std()
+
+        # Bollinger Bands
+        df['bb_middle'] = df['Close'].rolling(window=20).mean()
+        df['bb_std'] = df['Close'].rolling(window=20).std()
+        df['bb_upper'] = df['bb_middle'] + (2 * df['bb_std'])
+        df['bb_lower'] = df['bb_middle'] - (2 * df['bb_std'])
+        df['bb_position'] = (df['Close'] - df['bb_lower']) / (df['bb_upper'] - df['bb_lower'])
+
+        # ATR (Average True Range) - simplified version
+        df['high_low'] = df['High'] - df['Low']
+        df['high_close'] = abs(df['High'] - df['Close'].shift(1))
+        df['low_close'] = abs(df['Low'] - df['Close'].shift(1))
+        df['true_range'] = df[['high_low', 'high_close', 'low_close']].max(axis=1)
+        df['atr_14'] = df['true_range'].rolling(window=14).mean()
+
+        # Drop intermediate calculation columns
+        df.drop(['bb_middle', 'bb_std', 'high_low', 'high_close', 'low_close', 'true_range'],
+                axis=1, inplace=True)
+
+        self.features.extend(['volatility_10', 'volatility_20', 'volatility_50',
+                              'bb_upper', 'bb_lower', 'bb_position', 'atr_14'])
+
+        return df
 
 def main():
     """Test feature engineering on NVDA data."""
@@ -79,6 +117,7 @@ def main():
     engineer = FeatureEngineer()
     df = engineer.add_returns(df)
     df = engineer.add_moving_averages(df)
+    df = engineer.add_volatility(df)
 
     print(f"After feature engineering: {df.shape}")
     print(f"New features added: {len(engineer.features)}")
