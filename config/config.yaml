@@ -26,8 +26,8 @@ cnn:
   filters: [64, 128, 64]
   kernel_size: 3
   pool_size: 2
-  droppout: 0.3
-  sequuence_lenght: 20
+  dropout: 0.3
+  sequence_lenght: 20
 
 lstm:
   hidden_size: 64
