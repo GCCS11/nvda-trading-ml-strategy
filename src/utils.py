@@ -31,25 +31,27 @@ def load_config(config_path: str = None) -> dict:
 
     return config
 
+
 def main():
-    """
-    Test config loading.
-    """
+    """Test config loading."""
     config = load_config()
 
-    print("Configuration loaded succesfully.")
+    print("Configuration loaded successfully!")
     print("\nData config:")
-    print(f"  Ticker: {config["data"]["ticker"]}")
-    print(f"  Train/Test/Val: {config['data']['train_split']}/{config['data']['test_split']}/{config['data']['val_split']}")
+    print(f"  Ticker: {config['data']['ticker']}")
+    print(
+        f"  Train/Test/Val: {config['data']['train_split']}/{config['data']['test_split']}/{config['data']['val_split']}")
 
     print("\nModel config:")
     print(f"  Batch size: {config['model']['batch_size']}")
     print(f"  Epochs: {config['model']['epochs']}")
     print(f"  Learning rate: {config['model']['learning_rate']}")
 
-    print("nMLP architecture:")
-    print(f"  Hidden layers: {config["mlp"]["hidden_layers"]}")
+    print("\nMLP architecture:")
+    print(f"  Hidden layers: {config['mlp']['hidden_layers']}")
     print(f"  Dropout: {config['mlp']['dropout']}")
+
+    print("\nConfig test complete!")
 
 if __name__ == "__main__":
     main()

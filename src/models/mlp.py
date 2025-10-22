@@ -1,10 +1,10 @@
 """
-Multii-Layer Perceptron (MLP) model for trading signal prediction.
+Multi-Layer Perceptron (MLP) model for trading signal prediction.
 """
 
-#Import libraries
 import torch
 import torch.nn as nn
+
 
 class MLPModel(nn.Module):
     """
@@ -15,13 +15,13 @@ class MLPModel(nn.Module):
     def __init__(self, input_size: int, hidden_layers: list, dropout: float = 0.3,
                  num_classes: int = 3):
         """
-        Initiiliaze MLP model.
+        Initialize MLP model.
 
         Args:
-            input size: Number of input features.
-            hidden layers: List of hidden layers.
-            dropout: Dropout rate for regularization.
-            num_classes: Number of output classes.(3: lonog/hold/short)
+            input_size: Number of input features
+            hidden_layers: List of hidden layer sizes [128, 64, 32]
+            dropout: Dropout rate for regularization
+            num_classes: Number of output classes (3: long/hold/short)
         """
         super(MLPModel, self).__init__()
 
@@ -53,39 +53,41 @@ class MLPModel(nn.Module):
         """
         return self.network(x)
 
-    def main(self):
-        """Test MLP model creation."""
-        # Test parameters
-        input_size = 27
-        hidden_layers = [128, 64, 32]
-        batch_size = 32
 
-        # Create model
-        model = MLPModel(input_size=input_size, hidden_layers=hidden_layers)
+def main():
+    """Test MLP model creation."""
+    # Test parameters
+    input_size = 27  # Our number of features
+    hidden_layers = [128, 64, 32]
+    batch_size = 32
 
-        print("MLP Model Architecture:")
-        print("=" * 60)
-        print(model)
-        print("=" * 60)
+    # Create model
+    model = MLPModel(input_size=input_size, hidden_layers=hidden_layers)
 
-        # Count parameters
-        total_params = sum(p.numel() for p in model.parameters())
-        trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    print("MLP Model Architecture:")
+    print("="*60)
+    print(model)
+    print("="*60)
 
-        print(f"\nModel Statistics:")
-        print(f"  Total parameters: {total_params:,}")
-        print(f"  Trainable parameters: {trainable_params:,}")
+    # Count parameters
+    total_params = sum(p.numel() for p in model.parameters())
+    trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
 
-        # Test forward pass
-        dummy_input = torch.randn(batch_size, input_size)
-        output = model(dummy_input)
+    print(f"\nModel Statistics:")
+    print(f"  Total parameters: {total_params:,}")
+    print(f"  Trainable parameters: {trainable_params:,}")
 
-        print(f"\nForward Pass Test:")
-        print(f"  Input shape: {dummy_input.shape}")
-        print(f"  Output shape: {output.shape}")
-        print(f"  Output sample: {output[0]}")
+    # Test forward pass
+    dummy_input = torch.randn(batch_size, input_size)
+    output = model(dummy_input)
 
-        print("\n MLP model test complete.")
+    print(f"\nForward Pass Test:")
+    print(f"  Input shape: {dummy_input.shape}")
+    print(f"  Output shape: {output.shape}")
+    print(f"  Output sample: {output[0]}")
+
+    print("\nMLP model test complete!")
+
 
 if __name__ == "__main__":
     main()

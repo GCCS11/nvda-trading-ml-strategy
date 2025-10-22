@@ -224,21 +224,23 @@ def main():
     from data_loader import DataLoader
 
     # Load data
-    loader = DataLoader("NVDA")
+    loader = DataLoader('NVDA')
     df = loader.load_data()
 
     print(f"Original data: {df.shape}")
-    print("="*60)
+    print("=" * 60)
 
     # Create all features and target
     engineer = FeatureEngineer()
     df_processed = engineer.prepare_features(df)
 
-    print("="*60)
-    print(F"\n Feature engineering complete.")
-    print(f"   Shape: {df_processed.shape}")
-    print(f"   Features: {len(engineer.features)}")
-    print(f"   Date range: {df_processed["Date"].min()} to {df_processed["Date"].max()}")
+    print("=" * 60)
+    print(f"\n Feature engineering complete!")
+    print(f"  Shape: {df_processed.shape}")
+    print(f"  Features: {len(engineer.features)}")
+    date_min = df_processed['Date'].min()
+    date_max = df_processed['Date'].max()
+    print(f"  Date range: {date_min} to {date_max}")
 
 if __name__ == "__main__":
     main()
