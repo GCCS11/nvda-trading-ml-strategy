@@ -138,7 +138,18 @@ class ModelTrainer:
         train_loader, test_loader, val_loader = self.create_dataloaders(train_df, test_df, val_df)
 
         # MLFlw setup
-        criterion = nn.CrossEntropyLoss()
+        # Calculate class weights
+        class_counts = train_df['target'].value_counts().sort_index()
+        total = len(train_df)
+        class_weights = torch.FloatTensor([total / (3 * count) for count in class_counts]).to(self.device)
+
+        # Calculate class weights
+        class_counts = train_df['target'].value_counts().sort_index()
+        total = len(train_df)
+        class_weights = torch.FloatTensor([total / (3 * count) for count in class_counts]).to(self.device)
+
+        criterion = nn.CrossEntropyLoss(weight=class_weights)
+
         optimizer = optim.Adam(self.model.parameters(), lr=self.config["model"]["learning_rate"])
 
         mlflow.set_experiment(experiment_name)
