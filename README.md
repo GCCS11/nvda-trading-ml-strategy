@@ -1,61 +1,84 @@
 # NVDA Deep Learning Trading Strategy
 
-A systematic trading strategy using deep learning models ((MLP, CNN, LSTM) trained on engineered time series features for NVDA stock.
+A systematic trading strategy using deep learning models (MLP, CNN, LSTM) trained on engineered time series features for NVDA stock.
 
-## Project Structure
+Project Structure
 ```
 ├── data/               # Data storage
-│   ├── raw/           # Raw downloaded data
-│   └── processed/     # Processed features
+│   ├── raw/           # Raw NVDA data (15 years)
+│   └── processed/     # Processed features and splits
 ├── src/               # Source code
-│   ├── models/        # Neural network architectures
-│   └── data_loader.py # Data download and validation
-├── notebooks/         # Jupyter notebooks for analysis
+│   ├── models/        # Neural network architectures (MLP, CNN, LSTM)
+│   ├── data_loader.py
+│   ├── feature_engineering.py
+│   ├── data_preprocessing.py
+│   ├── training.py
+│   ├── backtesting.py
+│   └── utils.py
+├── notebooks/         # Jupyter notebooks
+│   └── 03_data_drift_analysis.ipynb
 ├── config/           # Configuration files
-└── mlruns/          # MLFlow experiment tracking
+│   └── config.yaml
+├── models/           # Saved model weights
+│   └── saved/
+├── reports/          # Analysis outputs and visualizations
+└── report/           # Executive report (deliverable)
+    └── Executive_Report.md
 ```
 
-## Setup
+## Setup and Installation
 
 ### Requirements
 - Python 3.10+
-- CUDA-capable GPU (recommended for training)
+- CUDA-capable GPU (recommended)
+- 16GB RAM
 
 ### Installation
 ```bash
 # Clone repository
-git clone https://github.com/yourusername/nvda-trading-ml-strategy.git
+git clone https://github.com/GCCS11/nvda-trading-ml-strategy.git
 cd nvda-trading-ml-strategy
 
 # Create virtual environment
 python -m venv .venv
-.venv\Scripts\activate
+.venv\Scripts\activate  # Windows
+# source .venv/bin/activate  # Mac/Linux
 
 # Install dependencies
 pip install --no-cache-dir -r requirements.txt
+
+# For GPU support (NVIDIA)
+pip uninstall torch torchvision
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
 ## Usage
 
-### Download Data
+### 1. Download Data
 ```bash
 python src/data_loader.py
 ```
 
-This downloads 15 years of NVDA historical data from Yahoo Finance.
+### 2. Generate Features and Preprocess
+```bash
+python src/data_preprocessing.py
+```
 
-## Project Status
+### 3. Train Models
+```bash
+python src/train_all_models.py
+```
 
-- [x] Project setup
-- [x] Data loader implementation
-- [ ] Feature engineering
-- [ ] Model implementation (MLP, CNN, LSTM)
-- [ ] MLFlow integration
-- [ ] Data drift analysis
-- [ ] Backtesting engine
-- [ ] Executive report
+### 4. Run Backtesting
+```bash
+python src/backtesting.py
+```
 
-## Author
+### 5. View Data Drift Analysis
+```bash
+jupyter notebook notebooks/03_data_drift_analysis.ipynb
+```
 
-Developed as part of 003 Advanced Trading Strategies: Deep Learning project by Gian Carlo Campos Sayavedra.
+## 👤 Author
 
+Developed as part of Microestructuras y Sistemas de Trading - 003 Advanced Trading Strategies: Deep Learning course project by Gian Carlo Campos Sayavedra.
