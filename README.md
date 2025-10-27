@@ -79,6 +79,12 @@ python src/backtesting.py
 jupyter notebook notebooks/03_data_drift_analysis.ipynb
 ```
 
+### 6. View Executive Report
+```bash
+# The complete analysis and results are in:
+report/Executive_Report.md
+```
+
 ## 👤 Author
 
 Developed as part of Microestructuras y Sistemas de Trading - 003 Advanced Trading Strategies: Deep Learning course project by Gian Carlo Campos Sayavedra.
