@@ -40,16 +40,34 @@ class Backtester:
         self.stop_loss = self.config['trading']['stop_loss']
         self.take_profit = self.config['trading']['take_profit']
 
-    def predict(self, features):
-        """Generate predictions from model."""
+    def predict(self, features, confidence_threshold=0.70):
+        """
+        Generate predictions from model with confidence filtering.
+
+        Args:
+            features: Input features
+            confidence_threshold: Minimum confidence to trade (default: 0.70)
+        """
         with torch.no_grad():
             features_tensor = torch.FloatTensor(features).to(self.device)
             outputs = self.model(features_tensor)
-            predictions = outputs.argmax(dim=1).cpu().numpy()
 
-        # Convert from 0,1,2 to -1,0,1 (short, hold, long)
-        predictions = predictions - 1
-        return predictions
+            # Get probabilities
+            probabilities = torch.nn.functional.softmax(outputs, dim=1)
+            max_probs, predictions = probabilities.max(dim=1)
+
+            # Convert to numpy
+            max_probs = max_probs.cpu().numpy()
+            predictions = predictions.cpu().numpy()
+
+            # Apply confidence filter - set low confidence to "Hold" (0)
+            low_confidence = max_probs < confidence_threshold
+            predictions[low_confidence] = 1  # 1 = Hold in 0,1,2 encoding
+
+            # Convert from 0,1,2 to -1,0,1 (short, hold, long)
+            signals = predictions - 1
+
+            return signals, max_probs
 
     def calculate_position_size(self, capital, price):
         """Calculate number of shares to trade."""
@@ -57,7 +75,8 @@ class Backtester:
         shares = int(capital / price)
         return shares
 
-    def run_backtest(self, df: pd.DataFrame, period_name: str = "Test"):
+    def run_backtest(self, df: pd.DataFrame, period_name: str = "Test",
+                     only_long: bool = True):
         """
         Run backtest on a dataset.
 
@@ -73,7 +92,10 @@ class Backtester:
 
         # Generate predictions
         features = df[self.feature_columns].values
-        predictions = self.predict(features)
+        predictions, confidences = self.predict(features, confidence_threshold=0.70)
+
+        if only_long:
+            predictions[predictions == -1] = 0  # Convert shorts to holds
 
         # Initialize tracking variables
         capital = self.initial_capital
@@ -391,7 +413,9 @@ def main():
 
     # Run backtests
     for df, period_name in [(test_df, 'Test'), (val_df, 'Validation')]:
-        trades_df, equity_df, final_capital = backtester.run_backtest(df, period_name)
+        trades_df, equity_df, final_capital = backtester.run_backtest(
+            df, period_name, only_long=True  # <-- Add this
+        )
         metrics = backtester.calculate_metrics(trades_df, equity_df, final_capital)
         backtester.print_results(metrics, period_name, final_capital)
         backtester.plot_results(equity_df, period_name)
