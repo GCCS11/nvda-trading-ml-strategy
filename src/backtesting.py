@@ -76,26 +76,47 @@ class Backtester:
         return shares
 
     def run_backtest(self, df: pd.DataFrame, period_name: str = "Test",
-                     only_long: bool = True):
+                     strategy_mode: str = "smart"):
         """
         Run backtest on a dataset.
 
         Args:
             df: DataFrame with features and price data
             period_name: Name of the period (for reporting)
+            strategy_mode: 'long_only', 'smart', or 'all_signals'
+                - 'long_only': Only long positions, ignore shorts
+                - 'smart': Long at 70% confidence, Short at 80% confidence
+                - 'all_signals': Use all predictions above 70%
 
         Returns:
             DataFrame with trade results and equity curve
         """
         print(f"\nRunning backtest on {period_name} period...")
-        print("="*60)
+        print(f"Strategy mode: {strategy_mode}")
+        print("=" * 60)
 
         # Generate predictions
         features = df[self.feature_columns].values
         predictions, confidences = self.predict(features, confidence_threshold=0.70)
 
-        if only_long:
-            predictions[predictions == -1] = 0  # Convert shorts to holds
+        # Apply strategy mode
+        if strategy_mode == 'long_only':
+            # Convert all shorts to holds
+            predictions[predictions == -1] = 0
+        elif strategy_mode == 'smart':
+            # Only take shorts with 80%+ confidence
+            low_confidence_shorts = (predictions == -1) & (confidences < 0.80)
+            predictions[low_confidence_shorts] = 0
+        elif strategy_mode == 'all_signals':
+            # Use all signals that passed 70% threshold
+            pass
+
+        # Print signal distribution for this strategy
+        unique, counts = np.unique(predictions, return_counts=True)
+        print("Signal distribution after filtering:")
+        for signal, count in zip(unique, counts):
+            signal_name = {-1: 'Short', 0: 'Hold', 1: 'Long'}[signal]
+            print(f"  {signal_name}: {count}")
 
         # Initialize tracking variables
         capital = self.initial_capital

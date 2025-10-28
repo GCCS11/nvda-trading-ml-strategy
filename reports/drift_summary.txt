@@ -1,0 +1,73 @@
+DATA DRIFT ANALYSIS SUMMARY
+============================================================
+
+Features with Significant Drift (p < 0.05):
+------------------------------------------------------------
+
+Train vs Test:
+  25 features
+    - returns: p-value = 0.0000
+    - log_returns: p-value = 0.0000
+    - returns_5d: p-value = 0.0001
+    - returns_10d: p-value = 0.0000
+    - returns_20d: p-value = 0.0000
+    - sma_10: p-value = 0.0000
+    - sma_20: p-value = 0.0000
+    - sma_50: p-value = 0.0000
+    - price_to_sma10: p-value = 0.0000
+    - price_to_sma20: p-value = 0.0000
+    - price_to_sma50: p-value = 0.0000
+    - volatility_10: p-value = 0.0000
+    - volatility_20: p-value = 0.0000
+    - volatility_50: p-value = 0.0000
+    - bb_upper: p-value = 0.0000
+    - bb_lower: p-value = 0.0000
+    - atr_14: p-value = 0.0000
+    - volume_sma_10: p-value = 0.0000
+    - volume_sma_20: p-value = 0.0000
+    - volume_ratio: p-value = 0.0000
+    - obv: p-value = 0.0000
+    - macd: p-value = 0.0000
+    - macd_signal: p-value = 0.0000
+    - macd_diff: p-value = 0.0000
+    - roc_10: p-value = 0.0000
+
+Train vs Val:
+  27 features
+    - returns: p-value = 0.0000
+    - log_returns: p-value = 0.0000
+    - returns_5d: p-value = 0.0000
+    - returns_10d: p-value = 0.0000
+    - returns_20d: p-value = 0.0000
+    - sma_10: p-value = 0.0000
+    - sma_20: p-value = 0.0000
+    - sma_50: p-value = 0.0000
+    - price_to_sma10: p-value = 0.0000
+    - price_to_sma20: p-value = 0.0000
+    - price_to_sma50: p-value = 0.0000
+    - volatility_10: p-value = 0.0000
+    - volatility_20: p-value = 0.0000
+    - volatility_50: p-value = 0.0000
+    - bb_upper: p-value = 0.0000
+    - bb_lower: p-value = 0.0000
+    - bb_position: p-value = 0.0000
+    - atr_14: p-value = 0.0000
+    - volume_sma_10: p-value = 0.0000
+    - volume_sma_20: p-value = 0.0000
+    - volume_ratio: p-value = 0.0000
+    - obv: p-value = 0.0000
+    - rsi_14: p-value = 0.0000
+    - macd: p-value = 0.0000
+    - macd_signal: p-value = 0.0000
+    - macd_diff: p-value = 0.0000
+    - roc_10: p-value = 0.0000
+
+============================================================
+
+Interpretation:
+Features with p-value < 0.05 show significant distribution changes.
+This may indicate:
+  - Market regime changes
+  - Volatility shifts
+  - Structural breaks in the data
+  - Need for model retraining or adaptation
