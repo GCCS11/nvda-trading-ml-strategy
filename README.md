@@ -85,6 +85,6 @@ jupyter notebook notebooks/03_data_drift_analysis.ipynb
 report/Executive_Report.md
 ```
 
-## 👤 Author
+## Author
 
 Developed as part of Microestructuras y Sistemas de Trading - 003 Advanced Trading Strategies: Deep Learning course project by Gian Carlo Campos Sayavedra.
